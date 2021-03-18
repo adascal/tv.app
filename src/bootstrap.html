@@ -1,0 +1,20 @@
+<html>
+  <script type="text/javascript">
+    (function () {
+      var host = document.location.host;
+      var pathname = document.location.pathname;
+
+      var xhr = new XMLHttpRequest();
+
+      xhr.addEventListener('load', function () {
+        document.location.replace('https://' + host);
+      });
+      xhr.addEventListener('error', function () {
+        document.location.replace('http://' + host);
+      });
+
+      xhr.open('GET', 'https://' + host + pathname);
+      xhr.send();
+    })();
+  </script>
+</html>

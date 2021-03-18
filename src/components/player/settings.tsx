@@ -1,0 +1,114 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { VideoPlayerBase } from '@enact/moonstone/VideoPlayer';
+import map from 'lodash/map';
+
+import { AudioTrack, SourceTrack, SubtitleTrack } from 'components/media';
+import Popup from 'components/popup';
+import Select from 'components/select';
+
+const NONE = 'NONE';
+
+type Props = {
+  visible: boolean;
+  onClose: () => void;
+  player: React.MutableRefObject<VideoPlayerBase | undefined>;
+};
+
+const Settings: React.FC<Props> = ({ visible, onClose, player }) => {
+  const [audios, setAudios] = useState<AudioTrack[]>([]);
+  const [currentAudio, setCurrentAudio] = useState<string | null>(null);
+  const [sources, setSources] = useState<SourceTrack[]>([]);
+  const [currentSource, setCurrentSource] = useState<string | null>(null);
+  const [subtitles, setSubtitles] = useState<SubtitleTrack[]>([]);
+  const [currentSubtitle, setCurrentSubtitle] = useState<string | null>(NONE);
+
+  const audioOptions = useMemo(() => map(audios, (audio) => ({ title: `${audio.number} ${audio.name}`, value: audio.id })), [audios]);
+  const sourceOptions = useMemo(() => map(sources, (source) => ({ title: source.name, value: source.id })), [sources]);
+  const subtitleOptions = useMemo(
+    () => [
+      { title: 'Нет', value: NONE },
+      ...map(subtitles, (subtitle) => ({ title: `${subtitle.number} ${subtitle.name}`, value: subtitle.id })),
+    ],
+    [subtitles],
+  );
+
+  const handleVideoUpdate = useCallback(
+    (name: string, value: string) => {
+      if (player.current) {
+        const video: any = player.current.getVideoNode();
+
+        video[name] = value;
+      }
+    },
+    [player],
+  );
+
+  const handleAudioChange = useCallback(
+    (audio: string) => {
+      setCurrentAudio(audio);
+      handleVideoUpdate('audioTrack', audio);
+    },
+    [handleVideoUpdate],
+  );
+  const handleSourceChange = useCallback(
+    (source: string) => {
+      setCurrentSource(source);
+      handleVideoUpdate('sourceTrack', source);
+    },
+    [handleVideoUpdate],
+  );
+  const handleSubtitleChange = useCallback(
+    (subtitle: string) => {
+      setCurrentSubtitle(subtitle);
+      handleVideoUpdate('subtitleTrack', subtitle);
+    },
+    [handleVideoUpdate],
+  );
+
+  const handleClose = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    if (visible && player.current) {
+      const video: any = player.current.getVideoNode();
+      const { audioTracks, audioTrack, sourceTracks, sourceTrack, subtitleTracks, subtitleTrack } = video;
+
+      if (audioTracks?.length > 1 || sourceTracks?.length > 1 || subtitleTracks?.length > 0) {
+        setAudios(audioTracks);
+        setCurrentAudio(audioTrack);
+
+        setSources(sourceTracks);
+        setCurrentSource(sourceTrack);
+
+        setSubtitles(subtitleTracks);
+        setCurrentSubtitle(subtitleTrack || NONE);
+      } else {
+        handleClose();
+      }
+    }
+  }, [visible, player, handleClose]);
+
+  return (
+    <Popup visible={visible} onClose={handleClose}>
+      {audioOptions.length > 1 && (
+        <Select className="my-1" label="Звук" value={currentAudio} options={audioOptions} onChange={handleAudioChange} splitIn={2} />
+      )}
+      {sourceOptions.length > 1 && (
+        <Select className="my-1" label="Качество" value={currentSource} options={sourceOptions} onChange={handleSourceChange} splitIn={4} />
+      )}
+      {subtitleOptions.length > 1 && (
+        <Select
+          className="my-1"
+          label="Субтитры"
+          value={currentSubtitle}
+          options={subtitleOptions}
+          onChange={handleSubtitleChange}
+          splitIn={4}
+        />
+      )}
+    </Popup>
+  );
+};
+
+export default Settings;

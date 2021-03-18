@@ -1,0 +1,14 @@
+{
+  "id": "tv.app",
+  "vendor": "LGE-SVL",
+  "type": "web",
+  "main": "index.html",
+  "title": "TV App",
+  "icon": "icon.png",
+  "miniicon": "icon-mini.png",
+  "largeIcon": "icon-large.png",
+  "splashBackground": "splashBackground.png",
+  "iconColor": "black",
+  "uiRevision": 2,
+  "disableBackHistoryAPI": true
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <link rel="shortcut icon" href="%PUBLIC_URL%/logo.png" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title><%= process.env.REACT_APP_TITLE %></title>
+    <% if (process.env.REACT_APP_GTAG_ID) { %>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= process.env.REACT_APP_GTAG_ID %>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '<%= process.env.REACT_APP_GTAG_ID %>');
+    </script>
+    <% } %>
+    <script type="text/javascript">
+      window.addEventListener('error', function(ev) {
+        var stack = (ev.error && ev.error.stack) || null;
+        var errorInfo = {
+          stack,
+          message: ev.message,
+          url: ev.filename,
+          line: ev.lineno,
+          column: ev.colno,
+          ua: navigator.userAgent,
+        };
+        console.log(JSON.stringify(errorInfo));
+        if (ev.message && ev.message.indexOf('ChunkLoadError') !== -1) {
+          window.location.reload();
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
